@@ -1,22 +1,14 @@
 { den, ... }:
 {
-  den.hosts.x86_64-linux.bad = {
-    displayScaling = 2;
-    users.tux = { };
-  };
-  den.hosts.x86_64-linux.good = {
+  den.hosts.x86_64-linux.dupe = {
     displayScaling = 2;
     users.tux = { };
   };
 
-  den.aspects.bad.includes = [ den.aspects.bad_cosmic ];
-  den.aspects.good.includes = [
-    den.aspects.good_cosmic
-    den.aspects.wayland
-  ];
+  den.aspects.dupe.includes = [ den.aspects.wayland._.cosmic ];
 
   den.aspects = {
-    wayland =
+    wayland._.base =
       { host, ... }:
       {
         nixos =
@@ -26,15 +18,16 @@
           };
       };
 
-    bad_cosmic = {
-      includes = [ den.aspects.wayland ];
-      nixos.services = {
-        desktopManager.cosmic.enable = true;
-        displayManager.cosmic-greeter.enable = true;
-      };
-    };
-
-    good_cosmic = {
+    wayland._.cosmic = den.lib.parametric {
+      includes = [ den.aspects.wayland._.base ];
+      homeManager =
+        { lib, pkgs, ... }:
+        {
+          gtk.iconTheme = {
+            name = lib.mkForce "Cosmic";
+            package = lib.mkForce pkgs.cosmic-icons;
+          };
+        };
       nixos.services = {
         desktopManager.cosmic.enable = true;
         displayManager.cosmic-greeter.enable = true;
