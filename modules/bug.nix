@@ -1,44 +1,35 @@
 { den, ... }:
 {
-  den.hosts.x86_64-linux.bad = {
-    displayScaling = 2;
-    users.tux = { };
+  # Name is the number of duplicate imports created
+  den.hosts.x86_64-linux.eight.users.tux = { };
+  den.hosts.x86_64-linux.four.users.tux = { };
+  den.hosts.x86_64-linux.two.users.tux = { };
+  den.hosts.x86_64-linux.none.users.tux = { };
+
+  den.aspects.eight.includes = [ den.aspects.some-specific-desktop ];
+
+  den.aspects.four.includes = [ den.aspects.desktop ];
+
+  den.aspects.two.includes = [ den.aspects.workstation ];
+
+  den.aspects.none.includes = [ den.aspects.fish ];
+
+  den.aspects.some-specific-desktop = den.lib.parametric {
+    includes = [ den.aspects.desktop ];
   };
-  den.hosts.x86_64-linux.good = {
-    displayScaling = 2;
-    users.tux = { };
+
+  den.aspects.desktop = den.lib.parametric {
+    includes = [ den.aspects.workstation ];
   };
 
-  den.aspects.bad.includes = [ den.aspects.bad_cosmic ];
-  den.aspects.good.includes = [
-    den.aspects.good_cosmic
-    den.aspects.wayland
-  ];
+  den.aspects.workstation = den.lib.parametric {
+    includes = [ den.aspects.fish ];
+  };
 
-  den.aspects = {
-    wayland =
-      { host, ... }:
-      {
-        nixos =
-          { lib, ... }:
-          {
-            environment.variables.XCURSOR_SIZE = lib.mkForce (32 * host.displayScaling);
-          };
-      };
-
-    bad_cosmic = {
-      includes = [ den.aspects.wayland ];
-      nixos.services = {
-        desktopManager.cosmic.enable = true;
-        displayManager.cosmic-greeter.enable = true;
-      };
+  den.aspects.fish.nixos =
+    { pkgs, ... }:
+    {
+      programs.fish.enable = true;
+      programs.fish.package = pkgs.fish;
     };
-
-    good_cosmic = {
-      nixos.services = {
-        desktopManager.cosmic.enable = true;
-        displayManager.cosmic-greeter.enable = true;
-      };
-    };
-  };
 }
