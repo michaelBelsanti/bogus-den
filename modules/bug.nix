@@ -1,35 +1,46 @@
 { den, ... }:
 {
-  # Name is the number of duplicate imports created
-  den.hosts.x86_64-linux.eight.users.tux = { };
-  den.hosts.x86_64-linux.four.users.tux = { };
-  den.hosts.x86_64-linux.two.users.tux = { };
-  den.hosts.x86_64-linux.none.users.tux = { };
 
-  den.aspects.eight.includes = [ den.aspects.some-specific-desktop ];
-
-  den.aspects.four.includes = [ den.aspects.desktop ];
-
-  den.aspects.two.includes = [ den.aspects.workstation ];
-
-  den.aspects.none.includes = [ den.aspects.fish ];
-
-  den.aspects.some-specific-desktop = den.lib.parametric {
-    includes = [ den.aspects.desktop ];
+  den.hosts.x86_64-linux.test = {
+    primaryDisplay.scaling = 2;
+    users.tux = { };
   };
 
-  den.aspects.desktop = den.lib.parametric {
-    includes = [ den.aspects.workstation ];
-  };
+  den.aspects.test.includes = [ den.aspects.laptop ];
+  den.aspects.laptop.includes = [ den.aspects.workstation ];
+  den.aspects.workstation.includes = [
+    den.aspects.browser
+    # den.aspects.wayland._.cosmic
+  ];
 
-  den.aspects.workstation = den.lib.parametric {
-    includes = [ den.aspects.fish ];
-  };
-
-  den.aspects.fish.nixos =
+  den.aspects.browser.homeManager =
     { pkgs, ... }:
     {
-      programs.fish.enable = true;
-      programs.fish.package = pkgs.fish;
+      programs.firefox = {
+        enable = true;
+        package = pkgs.firefox;
+      };
     };
+
+  # den.aspects.wayland.provides = {
+  #   base =
+  #     { host, ... }:
+  #     {
+  #       nixos =
+  #         { lib, ... }:
+  #         {
+  #           environment.sessionVariables = {
+  #             XCURSOR_SIZE = lib.mkForce (builtins.ceil (32 * host.primaryDisplay.scaling));
+  #             NIXOS_OZONE_WL = "1";
+  #           };
+  #         };
+  #     };
+  #   cosmic = den.lib.parametric {
+  #     includes = [ den.aspects.wayland._.base ];
+  #     nixos = {
+  #       services.desktopManager.cosmic.enable = true;
+  #       services.displayManager.cosmic-greeter.enable = true;
+  #     };
+  #   };
+  # };
 }
