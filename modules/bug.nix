@@ -8,6 +8,6 @@
   imports = [ (inputs.den.namespace "styx" inputs.nixconfig) ];
   den.hosts.x86_64-linux.bad.users.quasi = { };
   den.hosts.x86_64-linux.good.users.quasi = { };
-  den.aspects.bad.includes = [ styx.services._.ssh ];
-  den.aspects.good.includes = [ styx.performance ];
+  den.aspects.bad.includes = [ styx.services._.ssh._.client ];
+  den.aspects.good.includes = [ styx.networking._.static ];
 }
